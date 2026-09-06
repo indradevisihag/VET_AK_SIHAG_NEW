@@ -23,6 +23,7 @@ function App() {
   const [user, setUser] = useState(null);
   const [patients, setPatients] = useState([]);
   const [prescriptions, setPrescriptions] = useState([]);
+  const [diagnoses, setDiagnoses] = useState([]);
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -55,11 +56,13 @@ function App() {
   const [form, setForm] = useState(emptyPatient);
   const [medicineForm, setMedicineForm] = useState(emptyMedicine);
   const [prescriptionNotes, setPrescriptionNotes] = useState('');
+  const [diagnosisForm, setDiagnosisForm] = useState({ diagnosis: '', symptoms: '', treatment: '', notes: '' });
 
   useEffect(() => {
     const backSubscription = BackHandler.addEventListener("hardwareBackPress", () => {
       if (screen === "patients") { setScreen("dashboard"); return true; }
       if (screen === "patientDetails") { setScreen("patients"); return true; }
+      if (screen === "diagnosis") { setScreen("patientDetails"); return true; }
       if (screen === "prescriptionPatients") { setScreen("dashboard"); return true; }
       if (screen === "prescriptions") { setScreen("prescriptionPatients"); return true; }
       if (screen === "prescriptionDetails") { setScreen("prescriptions"); return true; }
@@ -78,9 +81,11 @@ function App() {
       const loggedIn = await AsyncStorage.getItem('loggedIn');
       const savedPatients = await AsyncStorage.getItem('patients');
       const savedPrescriptions = await AsyncStorage.getItem('prescriptions');
+      const savedDiagnoses = await AsyncStorage.getItem('diagnoses');
 
       if (savedPatients) setPatients(JSON.parse(savedPatients));
       if (savedPrescriptions) setPrescriptions(JSON.parse(savedPrescriptions));
+      if (savedDiagnoses) setDiagnoses(JSON.parse(savedDiagnoses));
 
       if (savedUser && loggedIn === 'true') {
         setUser(JSON.parse(savedUser));
@@ -96,6 +101,21 @@ function App() {
   const savePatients = async (data) => {
     setPatients(data);
     await AsyncStorage.setItem('patients', JSON.stringify(data));
+  };
+
+  const saveDiagnosis = async () => {
+    if (!selectedPatient) return;
+    if (diagnosisForm.diagnosis.trim() === '') { Alert.alert('Required', 'Diagnosis भरें।'); return; }
+    const item = { id: Date.now().toString(), patientId: selectedPatient.id, diagnosis: diagnosisForm.diagnosis.trim(), symptoms: diagnosisForm.symptoms.trim(), treatment: diagnosisForm.treatment.trim(), notes: diagnosisForm.notes.trim(), createdAt: new Date().toISOString() };
+    await saveDiagnoses([...diagnoses, item]);
+    setDiagnosisForm({ diagnosis: '', symptoms: '', treatment: '', notes: '' });
+    Alert.alert('Saved', 'Diagnosis successfully saved.');
+    setScreen('patientDetails');
+  };
+
+  const saveDiagnoses = async (data) => {
+    setDiagnoses(data);
+    await AsyncStorage.setItem('diagnoses', JSON.stringify(data));
   };
 
   const savePrescriptions = async (data) => {
@@ -471,7 +491,7 @@ function App() {
           </TouchableOpacity>
 
           <View style={styles.quickGrid}>
-            <QuickButton title="🩺 Diagnosis" />
+            <TouchableOpacity style={styles.quickButton} onPress={() => setScreen('diagnosis')}><Text style={styles.quickText}>🩺 Diagnosis</Text></TouchableOpacity>
             <QuickButton title="💉 Vaccination" />
             <QuickButton title="📊 Reports" />
           </View>
@@ -580,6 +600,7 @@ function App() {
             <Text style={styles.buttonText}>✏️ Edit Patient</Text>
           </TouchableOpacity>
 
+          <TouchableOpacity style={styles.prescriptionButton} onPress={() => setScreen('diagnosis')}><Text style={styles.prescriptionText}>🩺 Diagnosis</Text></TouchableOpacity>
           <TouchableOpacity
             style={styles.prescriptionButton}
             onPress={() => setScreen('prescriptions')}
@@ -592,6 +613,32 @@ function App() {
             onPress={() => deletePatient(p)}
           >
             <Text style={styles.deleteText}>Delete Patient</Text>
+          </TouchableOpacity>
+        </ScrollView>
+      </SafeAreaView>
+    );
+  }
+
+  if (screen === 'diagnosis' && selectedPatient) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <ScrollView contentContainerStyle={styles.form}>
+          <TouchableOpacity onPress={() => setScreen('patientDetails')}>
+            <Text style={styles.back}>‹ Back to Patient</Text>
+          </TouchableOpacity>
+          <Text style={styles.formTitle}>🩺 Diagnosis</Text>
+          <Text style={styles.muted}>{selectedPatient.animalType} • {selectedPatient.animalId}</Text>
+
+          <Text style={styles.label}>Diagnosis *</Text>
+          <TextInput style={styles.input} placeholder="Enter diagnosis" value={diagnosisForm.diagnosis} onChangeText={(v) => setDiagnosisForm({ ...diagnosisForm, diagnosis: v })} />
+          <Text style={styles.label}>Symptoms</Text>
+          <TextInput style={[styles.input, styles.textArea]} placeholder="Clinical signs / symptoms" value={diagnosisForm.symptoms} onChangeText={(v) => setDiagnosisForm({ ...diagnosisForm, symptoms: v })} multiline textAlignVertical="top" />
+          <Text style={styles.label}>Treatment</Text>
+          <TextInput style={[styles.input, styles.textArea]} placeholder="Treatment / advice" value={diagnosisForm.treatment} onChangeText={(v) => setDiagnosisForm({ ...diagnosisForm, treatment: v })} multiline textAlignVertical="top" />
+          <Text style={styles.label}>Notes</Text>
+          <TextInput style={[styles.input, styles.textArea]} placeholder="Additional notes" value={diagnosisForm.notes} onChangeText={(v) => setDiagnosisForm({ ...diagnosisForm, notes: v })} multiline textAlignVertical="top" />
+          <TouchableOpacity style={styles.primaryButton} onPress={saveDiagnosis}>
+            <Text style={styles.buttonText}>₮ Save Diagnosis</Text>
           </TouchableOpacity>
         </ScrollView>
       </SafeAreaView>
