@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import {
   Alert,
+  Image,
   BackHandler,
   KeyboardAvoidingView,
   Platform,
@@ -427,7 +428,7 @@ function App() {
         <ScrollView contentContainerStyle={styles.dashboard}>
           <View style={styles.header}>
             <View>
-              <Text style={styles.brandSmall}>VET AK SIHAG</Text>
+              <Image source={require('./assets/logo.png')} style={styles.dashboardLogo} resizeMode="contain" />
               <Text style={styles.welcome}>Veterinary Dashboard</Text>
             </View>
 
@@ -1092,6 +1093,7 @@ const styles = StyleSheet.create({
     color: '#176B57',
     fontWeight: '700',
   },
+  dashboardLogo: { width: 90, height: 90, marginBottom: 8 },
   dashboard: {
     padding: 20,
     paddingBottom: 40,
