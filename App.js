@@ -67,8 +67,8 @@ function App() {
       if (screen === "create") { setScreen("login"); return true; }
       return false;
     });
-    return () => backSubscription.remove();
     loadApp();
+    return () => backSubscription.remove();
   }, []);
 
   const loadApp = async () => {
