@@ -2,3 +2,5 @@ App_backup.js
 App_before_prescription.js
 node_modules/
 .expo/
+
+assets/*_backup.png
