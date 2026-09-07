@@ -601,6 +601,19 @@ function App() {
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.prescriptionButton} onPress={() => setScreen('diagnosis')}><Text style={styles.prescriptionText}>🩺 Diagnosis</Text></TouchableOpacity>
+          <Text style={styles.sectionTitle}>🩺 Diagnosis History</Text>
+          {diagnoses.filter(d => d.patientId === p.id).length === 0 ? (
+            <Text style={styles.muted}>No diagnosis recorded yet.</Text>
+          ) : (
+            diagnoses.filter(d => d.patientId === p.id).slice().reverse().map(d => (
+              <View key={d.id} style={styles.card}>
+                <Text style={styles.cardTitle}>{d.diagnosis}</Text>
+                <Text style={styles.cardText}>Symptoms: {d.symptoms || '-'} </Text>
+                <Text style={styles.cardText}>Treatment: {d.treatment || '-'} </Text>
+                <Text style={styles.cardText}>Date: {new Date(d.createdAt).toLocaleDateString()}</Text>
+              </View>
+            ))
+          )}
           <TouchableOpacity
             style={styles.prescriptionButton}
             onPress={() => setScreen('prescriptions')}
