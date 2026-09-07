@@ -357,7 +357,7 @@ function App() {
     const isCreate = screen === 'create';
 
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={[styles.container, { paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0 }]}>
         <StatusBar barStyle="dark-content" />
         <KeyboardAvoidingView
           style={{ flex: 1 }}
@@ -444,7 +444,7 @@ function App() {
 
   if (screen === 'dashboard') {
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={[styles.container, { paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0 }]}>
         <ScrollView contentContainerStyle={styles.dashboard}>
           <View style={styles.header}>
             <View>
@@ -502,7 +502,7 @@ function App() {
 
   if (screen === 'patients') {
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={[styles.container, { paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0 }]}>
         <View style={styles.pageHeader}>
           <TouchableOpacity onPress={() => setScreen('dashboard')}>
             <Text style={styles.back}>‹ Back</Text>
@@ -573,7 +573,7 @@ function App() {
     const p = selectedPatient;
 
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={[styles.container, { paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0 }]}>
         <ScrollView contentContainerStyle={styles.details}>
           <TouchableOpacity
             onPress={() => {
@@ -634,7 +634,7 @@ function App() {
 
   if (screen === 'diagnosis' && selectedPatient) {
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={[styles.container, { paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0 }]}>
         <ScrollView contentContainerStyle={styles.form}>
           <TouchableOpacity onPress={() => setScreen('patientDetails')}>
             <Text style={styles.back}>‹ Back to Patient</Text>
@@ -660,7 +660,7 @@ function App() {
 
   if (screen === 'prescriptionPatients') {
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={[styles.container, { paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0 }]}>
         <View style={styles.pageHeader}>
           <TouchableOpacity onPress={() => setScreen('dashboard')}>
             <Text style={styles.back}>‹ Back</Text>
@@ -700,7 +700,7 @@ function App() {
 
   if (screen === 'prescriptions' && selectedPatient) {
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={[styles.container, { paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0 }]}>
         <View style={styles.pageHeader}>
           <TouchableOpacity onPress={() => setScreen('dashboard')}>
             <Text style={styles.back}>‹ Back</Text>
@@ -767,7 +767,7 @@ function App() {
 
   if (screen === 'prescriptionForm') {
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={[styles.container, { paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0 }]}>
         <KeyboardAvoidingView
           style={{ flex: 1 }}
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -892,7 +892,7 @@ function App() {
     const p = selectedPrescription;
 
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={[styles.container, { paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0 }]}>
         <ScrollView contentContainerStyle={styles.details}>
           <TouchableOpacity onPress={() => setScreen('prescriptions')}>
             <Text style={styles.back}>‹ Back to Prescriptions</Text>
@@ -927,7 +927,7 @@ function App() {
 
   if (screen === 'patientForm') {
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={[styles.container, { paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0 }]}>
         <KeyboardAvoidingView
           style={{ flex: 1 }}
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}
