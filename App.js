@@ -477,7 +477,6 @@ const saveDiagnosis = async () => {
             <TouchableOpacity onPress={logout}>
               <Text style={styles.logout}>Logout</Text>
             </TouchableOpacity>
-          </TouchableOpacity>
 
           <View style={styles.card}>
             <Text style={styles.cardTitle}>Total Patients</Text>
