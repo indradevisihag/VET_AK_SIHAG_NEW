@@ -389,7 +389,7 @@ const saveDiagnosis = async () => {
             <View style={styles.logoBox}>
               <Text style={styles.brand}>VET AK SIHAG</Text>
               <Text style={styles.subtitle}>Veterinary Management App</Text>
-            </TouchableOpacity>
+            </View>
 
             <Text style={styles.title}>
               {isCreate ? 'Create Account' : 'Welcome Back'}
