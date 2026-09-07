@@ -472,7 +472,7 @@ const saveDiagnosis = async () => {
             <View>
               <Image source={require('./assets/logo.png')} style={styles.dashboardLogo} resizeMode="contain" />
               <Text style={styles.welcome}>Veterinary Dashboard</Text>
-            </TouchableOpacity>
+            </View>
 
             <TouchableOpacity onPress={logout}>
               <Text style={styles.logout}>Logout</Text>
