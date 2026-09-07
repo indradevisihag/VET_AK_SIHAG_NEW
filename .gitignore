@@ -4,3 +4,4 @@ node_modules/
 .expo/
 
 assets/*_backup.png
+app-release.apk
