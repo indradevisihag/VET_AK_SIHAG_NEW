@@ -32,6 +32,7 @@ function App() {
   const [search, setSearch] = useState('');
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [selectedPrescription, setSelectedPrescription] = useState(null);
+  const [selectedDiagnosis, setSelectedDiagnosis] = useState(null);
   const [editing, setEditing] = useState(false);
 
   const emptyPatient = {
@@ -62,7 +63,8 @@ function App() {
     const backSubscription = BackHandler.addEventListener("hardwareBackPress", () => {
       if (screen === "patients") { setScreen("dashboard"); return true; }
       if (screen === "patientDetails") { setScreen("patients"); return true; }
-      if (screen === "diagnosis") { setScreen("patientDetails"); return true; }
+      if (screen === "diagnosisDetails") { setScreen("patientDetails"); return true; }
+    if (screen === "diagnosis") { setScreen("patientDetails"); return true; }
       if (screen === "prescriptionPatients") { setScreen("dashboard"); return true; }
       if (screen === "prescriptions") { setScreen("prescriptionPatients"); return true; }
       if (screen === "prescriptionDetails") { setScreen("prescriptions"); return true; }
@@ -103,7 +105,27 @@ function App() {
     await AsyncStorage.setItem('patients', JSON.stringify(data));
   };
 
-  const saveDiagnosis = async () => {
+  const deleteDiagnosis = async (item) => {
+  Alert.alert(
+    'Delete Diagnosis',
+    'Are you sure you want to delete this diagnosis?',
+    [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Delete',
+        style: 'destructive',
+        onPress: async () => {
+          const updated = diagnoses.filter(d => d.id !== item.id);
+          await saveDiagnoses(updated);
+          setSelectedDiagnosis(null);
+          setScreen('patientDetails');
+        }
+      }
+    ]
+  );
+};
+
+const saveDiagnosis = async () => {
     if (!selectedPatient) return;
     if (diagnosisForm.diagnosis.trim() === '') { Alert.alert('Required', 'Diagnosis भरें।'); return; }
     const item = { id: Date.now().toString(), patientId: selectedPatient.id, diagnosis: diagnosisForm.diagnosis.trim(), symptoms: diagnosisForm.symptoms.trim(), treatment: diagnosisForm.treatment.trim(), notes: diagnosisForm.notes.trim(), createdAt: new Date().toISOString() };
@@ -367,7 +389,7 @@ function App() {
             <View style={styles.logoBox}>
               <Text style={styles.brand}>VET AK SIHAG</Text>
               <Text style={styles.subtitle}>Veterinary Management App</Text>
-            </View>
+            </TouchableOpacity>
 
             <Text style={styles.title}>
               {isCreate ? 'Create Account' : 'Welcome Back'}
@@ -450,18 +472,18 @@ function App() {
             <View>
               <Image source={require('./assets/logo.png')} style={styles.dashboardLogo} resizeMode="contain" />
               <Text style={styles.welcome}>Veterinary Dashboard</Text>
-            </View>
+            </TouchableOpacity>
 
             <TouchableOpacity onPress={logout}>
               <Text style={styles.logout}>Logout</Text>
             </TouchableOpacity>
-          </View>
+          </TouchableOpacity>
 
           <View style={styles.card}>
             <Text style={styles.cardTitle}>Total Patients</Text>
             <Text style={styles.patientCount}>{patients.length}</Text>
             <Text style={styles.muted}>Registered animals</Text>
-          </View>
+          </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.bigButton}
@@ -494,7 +516,7 @@ function App() {
             <TouchableOpacity style={styles.quickButton} onPress={() => setScreen('diagnosis')}><Text style={styles.quickText}>🩺 Diagnosis</Text></TouchableOpacity>
             <QuickButton title="💉 Vaccination" />
             <QuickButton title="📊 Reports" />
-          </View>
+          </TouchableOpacity>
         </ScrollView>
       </SafeAreaView>
     );
@@ -513,7 +535,7 @@ function App() {
           <TouchableOpacity onPress={openNewPatient}>
             <Text style={styles.addText}>+ Add</Text>
           </TouchableOpacity>
-        </View>
+        </TouchableOpacity>
 
         <View style={styles.searchBox}>
           <TextInput
@@ -522,7 +544,7 @@ function App() {
             value={search}
             onChangeText={setSearch}
           />
-        </View>
+        </TouchableOpacity>
 
         <ScrollView contentContainerStyle={styles.list}>
           {filteredPatients.length === 0 ? (
@@ -537,7 +559,7 @@ function App() {
                   ? 'Add your first patient.'
                   : 'Search with another name or ID.'}
               </Text>
-            </View>
+            </TouchableOpacity>
           ) : (
             filteredPatients.map((patient) => (
               <TouchableOpacity
@@ -558,7 +580,7 @@ function App() {
                   <Text style={styles.patientInfo}>
                     Mobile: {patient.ownerMobile || '-'}
                   </Text>
-                </View>
+                </TouchableOpacity>
 
                 <Text style={styles.arrow}>›</Text>
               </TouchableOpacity>
@@ -606,12 +628,12 @@ function App() {
             <Text style={styles.muted}>No diagnosis recorded yet.</Text>
           ) : (
             diagnoses.filter(d => d.patientId === p.id).slice().reverse().map(d => (
-              <View key={d.id} style={styles.card}>
+              <TouchableOpacity key={d.id} style={styles.card} onPress={() => { setSelectedDiagnosis(d); setScreen('diagnosisDetails'); }}>
                 <Text style={styles.cardTitle}>{d.diagnosis}</Text>
                 <Text style={styles.cardText}>Symptoms: {d.symptoms || '-'} </Text>
                 <Text style={styles.cardText}>Treatment: {d.treatment || '-'} </Text>
                 <Text style={styles.cardText}>Date: {new Date(d.createdAt).toLocaleDateString()}</Text>
-              </View>
+              </TouchableOpacity>
             ))
           )}
           <TouchableOpacity
@@ -658,6 +680,28 @@ function App() {
     );
   }
 
+
+  if (screen === 'diagnosisDetails' && selectedDiagnosis) {
+    const d = selectedDiagnosis;
+    return (
+      <SafeAreaView style={[styles.container, { paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0 }]}>
+        <ScrollView contentContainerStyle={styles.details}>
+          <TouchableOpacity onPress={() => setScreen('patientDetails')}>
+            <Text style={styles.back}>‹ Back to Patient</Text>
+          </TouchableOpacity>
+          <Text style={styles.detailsTitle}>🩺 Diagnosis Details</Text>
+          <DetailRow label="Diagnosis" value={d.diagnosis} />
+          <DetailRow label="Symptoms" value={d.symptoms || '-'} />
+          <DetailRow label="Treatment" value={d.treatment || '-'} />
+          <DetailRow label="Notes" value={d.notes || '-'} />
+          <DetailRow label="Date" value={new Date(d.createdAt).toLocaleDateString()} />
+          <TouchableOpacity style={styles.deleteButton} onPress={() => deleteDiagnosis(d)}>
+            <Text style={styles.deleteText}>🗑️ Delete Diagnosis</Text>
+          </TouchableOpacity>
+        </ScrollView>
+      </SafeAreaView>
+    );
+  }
   if (screen === 'prescriptionPatients') {
     return (
       <SafeAreaView style={[styles.container, { paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0 }]}>
@@ -669,7 +713,7 @@ function App() {
           <Text style={styles.pageTitle}>Select Patient</Text>
 
           <View style={{ width: 40 }} />
-        </View>
+        </TouchableOpacity>
 
         <ScrollView contentContainerStyle={styles.list}>
           {patients.map((patient) => (
@@ -688,7 +732,7 @@ function App() {
                 <Text style={styles.patientInfo}>
                   Owner: {patient.ownerName}
                 </Text>
-              </View>
+              </TouchableOpacity>
 
               <Text style={styles.arrow}>›</Text>
             </TouchableOpacity>
@@ -717,7 +761,7 @@ function App() {
           >
             <Text style={styles.addText}>+ New</Text>
           </TouchableOpacity>
-        </View>
+        </TouchableOpacity>
 
         <ScrollView contentContainerStyle={styles.details}>
           <View style={styles.patientHeaderCard}>
@@ -727,7 +771,7 @@ function App() {
             <Text style={styles.patientInfo}>
               Owner: {selectedPatient.ownerName}
             </Text>
-          </View>
+          </TouchableOpacity>
 
           {patientPrescriptions.length === 0 ? (
             <View style={styles.empty}>
@@ -735,7 +779,7 @@ function App() {
               <Text style={styles.muted}>
                 Tap + New to create the first prescription.
               </Text>
-            </View>
+            </TouchableOpacity>
           ) : (
             patientPrescriptions.map((p) => (
               <TouchableOpacity
@@ -786,7 +830,7 @@ function App() {
               <Text style={styles.patientInfo}>
                 Owner: {selectedPatient?.ownerName}
               </Text>
-            </View>
+            </TouchableOpacity>
 
             <Text style={styles.label}>Medicine Name *</Text>
             <TextInput
@@ -832,7 +876,7 @@ function App() {
                   </Text>
                 </TouchableOpacity>
               ))}
-            </View>
+            </TouchableOpacity>
 
             <Text style={styles.label}>Frequency</Text>
             <TextInput
@@ -1024,7 +1068,7 @@ function App() {
               >
                 <Text>Female</Text>
               </TouchableOpacity>
-            </View>
+            </TouchableOpacity>
 
             <Text style={styles.label}>Clinical History</Text>
             <TextInput
@@ -1074,7 +1118,7 @@ function DetailRow({ label, value }) {
     <View style={styles.detailRow}>
       <Text style={styles.detailLabel}>{label}</Text>
       <Text style={styles.detailValue}>{value}</Text>
-    </View>
+    </TouchableOpacity>
   );
 }
 
